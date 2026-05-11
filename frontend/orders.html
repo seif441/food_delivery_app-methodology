@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <title>Crave - Your Orders</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 pb-24 md:pb-0 min-h-screen">
+
+    <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100">
+        <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <button onclick="window.location.href='index.html'" class="p-2 -ml-2 hover:bg-gray-100 rounded-full text-gray-600 transition">
+                    <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                </button>
+                <h1 class="text-xl font-extrabold tracking-tight">Your Orders</h1>
+            </div>
+            <button class="text-orange-600 font-semibold text-sm hover:underline">Help</button>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 pt-6">
+        
+        <div class="flex p-1 bg-gray-200/50 rounded-xl mb-6 relative">
+            <div id="tab-indicator" class="absolute top-1 left-1 w-[calc(50%-4px)] h-[calc(100%-8px)] bg-white rounded-lg shadow-sm transition-all duration-300 ease-out transform translate-x-0"></div>
+            <button onclick="OrderManager.switchTab('active')" class="flex-1 relative z-10 py-2.5 text-sm font-bold text-center text-gray-900 transition-colors" id="tab-active">Active</button>
+            <button onclick="OrderManager.switchTab('past')" class="flex-1 relative z-10 py-2.5 text-sm font-bold text-center text-gray-500 transition-colors" id="tab-past">Past Orders</button>
+        </div>
+
+        <div id="orders-list" class="space-y-4">
+            </div>
+
+        <div id="loading-state" class="hidden space-y-4">
+            <div class="bg-white p-4 rounded-2xl h-32 animate-pulse"></div>
+            <div class="bg-white p-4 rounded-2xl h-32 animate-pulse"></div>
+        </div>
+
+        <div id="error-state" class="hidden text-center py-12">
+            <p class="text-red-500 font-medium" id="error-message">Something went wrong.</p>
+            <button onclick="OrderManager.fetchOrders()" class="mt-4 text-sm text-gray-600 underline">Try Again</button>
+        </div>
+
+    </main>
+
+    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 py-4 px-6 z-40 flex justify-between items-center">
+        <a href="index.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-orange-600 transition">
+            <i data-lucide="home" class="w-6 h-6"></i>
+            <span class="text-[10px]">Home</span>
+        </a>
+        
+        <button class="flex flex-col items-center gap-1 text-orange-600">
+            <i data-lucide="clock" class="w-6 h-6"></i>
+            <span class="text-[10px] font-bold">Orders</span>
+        </button>
+        
+        <button onclick="window.location.href='cart.html'" class="flex flex-col items-center gap-1 text-gray-400 hover:text-orange-600 transition">
+            <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+            <span class="text-[10px]">Cart</span>
+        </button>
+        
+        <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-orange-600 transition">
+            <i data-lucide="user" class="w-6 h-6"></i>
+            <span class="text-[10px]">Profile</span>
+        </button>
+    </nav>
+
+    <script src="js/api.js"></script>
+    <script src="js/orders.js"></script>
+</body>
+</html>

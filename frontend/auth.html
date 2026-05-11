@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <title>Crave - Authentication</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .auth-bg {
+            background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="auth-bg min-h-screen flex items-center justify-center p-4 font-sans text-gray-900">
+
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+    <div class="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden animate-fade-in">
+        
+        <div class="bg-orange-50 p-8 text-center border-b border-orange-100">
+            <div class="inline-flex items-center justify-center w-14 h-14 bg-orange-600 text-white rounded-2xl mb-3 shadow-lg shadow-orange-200">
+                <i data-lucide="chef-hat" class="w-8 h-8"></i>
+            </div>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Crave.</h1>
+            <p class="text-sm text-gray-500 font-medium mt-1">Delicious food, delivered to your door.</p>
+        </div>
+
+        <div class="flex p-1.5 bg-gray-100 m-6 rounded-xl relative">
+            <button id="tab-login" onclick="switchTab('login')" class="flex-1 py-3 text-sm font-bold rounded-lg transition-all shadow-sm bg-white text-gray-900">Login</button>
+            <button id="tab-register" onclick="switchTab('register')" class="flex-1 py-3 text-sm font-bold rounded-lg transition-all text-gray-500 hover:text-gray-700">Sign Up</button>
+        </div>
+
+        <div id="error-alert" class="hidden mx-6 mb-4 p-4 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl flex items-start gap-3">
+            <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+            <span id="error-message">Error message here</span>
+        </div>
+
+        <div class="px-8 pb-8">
+            <!-- LOGIN FORM -->
+            <form id="login-form" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Email</label>
+                    <div class="relative group">
+                        <i data-lucide="mail" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-orange-500"></i>
+                        <input type="email" name="email" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-4 outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all font-medium" placeholder="admin@example.com">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Password</label>
+                    <div class="relative group">
+                        <i data-lucide="lock" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-orange-500"></i>
+                        <input type="password" name="password" id="login-pass" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-12 outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all font-medium" placeholder="••••••••">
+                        <button type="button" onclick="togglePass('login-pass')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"><i data-lucide="eye" class="w-5 h-5"></i></button>
+                    </div>
+                </div>
+                
+                <button type="submit" id="btn-login" class="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-all shadow-xl mt-2 flex justify-center items-center gap-2">
+                    <span>Sign In</span> <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+            </form>
+
+            <!-- REGISTER FORM -->
+            <form id="register-form" class="space-y-4 hidden">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Name</label>
+                        <div class="relative group">
+                            <i data-lucide="user" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                            <input type="text" name="name" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-10 pr-3 outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all font-medium text-sm" placeholder="John">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Phone</label>
+                        <div class="relative group">
+                            <i data-lucide="phone" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                            <input type="tel" name="phoneNumber" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-10 pr-3 outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all font-medium text-sm" placeholder="123-456">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Email</label>
+                    <div class="relative group">
+                        <i data-lucide="mail" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-orange-500"></i>
+                        <input type="email" name="email" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-4 outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all font-medium" placeholder="you@example.com">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Password</label>
+                    <div class="relative group">
+                        <i data-lucide="lock" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-orange-500"></i>
+                        <input type="password" name="password" id="reg-pass" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-12 outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all font-medium" placeholder="Min 8 chars">
+                        <button type="button" onclick="togglePass('reg-pass')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"><i data-lucide="eye" class="w-5 h-5"></i></button>
+                    </div>
+                </div>
+                <button type="submit" id="btn-register" class="w-full bg-orange-600 text-white font-bold py-4 rounded-xl hover:bg-orange-700 transition-all shadow-xl mt-2">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        lucide.createIcons();
+
+        // 1. UI Toggle Logic
+        function switchTab(tab) {
+            const loginForm = document.getElementById('login-form');
+            const regForm = document.getElementById('register-form');
+            const tabLog = document.getElementById('tab-login');
+            const tabReg = document.getElementById('tab-register');
+            document.getElementById('error-alert').classList.add('hidden');
+
+            if(tab === 'login') {
+                loginForm.classList.remove('hidden');
+                regForm.classList.add('hidden');
+                tabLog.className = "flex-1 py-3 text-sm font-bold rounded-lg transition-all shadow-sm bg-white text-gray-900";
+                tabReg.className = "flex-1 py-3 text-sm font-bold rounded-lg transition-all text-gray-500 hover:text-gray-700";
+            } else {
+                loginForm.classList.add('hidden');
+                regForm.classList.remove('hidden');
+                tabReg.className = "flex-1 py-3 text-sm font-bold rounded-lg transition-all shadow-sm bg-white text-gray-900";
+                tabLog.className = "flex-1 py-3 text-sm font-bold rounded-lg transition-all text-gray-500 hover:text-gray-700";
+            }
+        }
+
+        function togglePass(id) {
+            const input = document.getElementById(id);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function showError(msg) {
+            const alert = document.getElementById('error-alert');
+            document.getElementById('error-message').textContent = msg;
+            alert.classList.remove('hidden');
+        }
+
+        function setLoading(btnId, isLoading) {
+            const btn = document.getElementById(btnId);
+            const originalText = btnId === 'btn-login' ? 'Sign In' : 'Create Account';
+            
+            if(isLoading) {
+                btn.disabled = true;
+                btn.innerHTML = `<svg class="animate-spin h-5 w-5 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+                btn.classList.add('opacity-80', 'cursor-not-allowed');
+            } else {
+                btn.disabled = false;
+                if(btnId === 'btn-login') btn.innerHTML = `<span>${originalText}</span><i data-lucide="arrow-right" class="w-5 h-5"></i>`;
+                else btn.innerHTML = originalText;
+                btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                lucide.createIcons();
+            }
+        }
+
+        // --- LOGIN LOGIC ---
+        document.getElementById('login-form').onsubmit = async (e) => {
+            e.preventDefault();
+            setLoading('btn-login', true);
+            const fd = new FormData(e.target);
+            
+            try {
+                const loggedInUser = await api.login(fd.get('email'), fd.get('password'));
+                localStorage.setItem('user', JSON.stringify(loggedInUser));
+                
+                console.log("SERVER RESPONSE:", loggedInUser); 
+
+                // 1. Get the role safely (handle case differences)
+                let role = (loggedInUser.roleName || loggedInUser.role?.roleName || "").toUpperCase();
+                
+                // 2. DEBUG ALERT if role is missing
+                if (!role || role === "") {
+                    alert("⚠️ LOGIN SUCCESSFUL BUT ROLE IS MISSING!\n\nThe Backend did not send 'roleName'.");
+                }
+
+                console.log("DETECTED ROLE:", role);
+
+                // --- FIXED REDIRECTION LOGIC ---
+                setTimeout(() => {
+                    if (role === 'ADMIN') {
+                        window.location.href = 'admin_dashboard.html';
+                    } else if (role === 'STAFF') {
+                        window.location.href = 'staff_dashboard.html';
+                    } else if (role === 'DELIVERY' || role === 'DELIVERY_STAFF') { 
+                        // ^ FIXED: Checks for both short and full role names
+                        window.location.href = 'delivery_dashboard.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                }, 500);
+
+            } catch (err) {
+                console.error(err);
+                showError(err.message || 'Invalid email or password.');
+                setLoading('btn-login', false);
+            }
+        };
+
+        // --- REGISTER LOGIC ---
+        document.getElementById('register-form').onsubmit = async (e) => {
+            e.preventDefault();
+            setLoading('btn-register', true);
+            const fd = new FormData(e.target);
+            const data = Object.fromEntries(fd.entries());
+
+            try {
+                await api.registerCustomer(data);
+                alert('Account created! Please login.');
+                switchTab('login');
+                setLoading('btn-register', false);
+            } catch (err) {
+                showError(err.message || 'Registration failed.');
+                setLoading('btn-register', false);
+            }
+        };
+    </script>
+</body>
+</html>

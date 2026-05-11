@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <title>Crave Driver - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Smooth transitions */
+        .transition-all-300 { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Animations */
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up { animation: slideInUp 0.5s ease-out forwards; }
+        
+        /* Map Pattern */
+        .bg-map-pattern {
+            background-color: #f8fafc;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e2e8f0' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 h-screen flex overflow-hidden selection:bg-orange-100 selection:text-orange-900">
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="hidden lg:flex w-64 flex-col bg-white border-r border-gray-200 h-full fixed left-0 top-0 z-30">
+        <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center gap-3">
+                <div class="bg-orange-600 text-white p-2.5 rounded-xl shadow-lg shadow-orange-200">
+                    <i data-lucide="chef-hat" class="w-6 h-6"></i>
+                </div>
+                <span class="text-2xl font-extrabold tracking-tight">Crave.</span>
+            </div>
+        </div>
+        
+        <nav class="flex-1 p-4 space-y-2">
+            <button onclick="DeliveryDashboard.switchView('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 bg-orange-50 text-orange-700 rounded-xl font-bold transition-all">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                Dashboard
+            </button>
+            <button onclick="DeliveryDashboard.switchView('history')" id="nav-history" class="w-full flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-semibold transition-all">
+                <i data-lucide="history" class="w-5 h-5"></i>
+                History
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-gray-100">
+            <div class="bg-gray-50 rounded-xl p-4 flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-gray-500 shadow-sm border border-gray-100">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <p id="sidebar-name" class="text-sm font-bold text-gray-900 truncate">Loading...</p>
+                    <p class="text-xs text-gray-500 truncate">Delivery Partner</p>
+                </div>
+            </div>
+            <button onclick="DeliveryDashboard.logout()" class="w-full flex items-center justify-center gap-2 text-red-600 hover:bg-red-50 py-2.5 rounded-lg text-sm font-bold transition-colors">
+                <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 flex flex-col h-full lg:ml-64 relative">
+        
+        <!-- MOBILE HEADER -->
+        <header class="lg:hidden bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-20 px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="bg-orange-600 text-white p-2 rounded-lg">
+                    <i data-lucide="bike" class="w-5 h-5"></i>
+                </div>
+                <span class="font-extrabold text-lg">Driver</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <div id="mobile-status-badge" class="px-2.5 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Online
+                </div>
+                <button onclick="DeliveryDashboard.logout()" class="p-2 text-gray-400">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- DESKTOP HEADER -->
+        <header class="hidden lg:flex bg-white border-b border-gray-200 px-8 py-5 justify-between items-center">
+            <div>
+                <h1 id="header-title" class="text-2xl font-bold text-gray-900">Dashboard</h1>
+                <p id="header-desc" class="text-sm text-gray-500 mt-1">Manage your deliveries and earnings</p>
+            </div>
+            <div class="flex items-center gap-6">
+                <!-- Status Toggle -->
+                <div class="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-full border border-gray-200">
+                    <span class="text-sm font-bold text-gray-600">Availability</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="desktop-toggle" class="sr-only peer" checked onclick="DeliveryDashboard.toggleAvailability()">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                        <span id="desktop-status-text" class="ml-3 text-sm font-medium text-green-600">Online</span>
+                    </label>
+                </div>
+            </div>
+        </header>
+
+        <!-- SCROLLABLE CONTENT AREA -->
+        <div class="flex-1 overflow-y-auto p-4 lg:p-8 space-y-8">
+            
+            <!-- VIEW 1: DASHBOARD (Active + Recent 5) -->
+            <div id="view-dashboard" class="space-y-8 animate-slide-up">
+                
+                <!-- Stats Row -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
+                        <span class="text-gray-500 text-xs font-bold uppercase tracking-wider">Today's Earnings</span>
+                        <div class="flex items-baseline gap-1 mt-2">
+                            <span class="text-2xl font-extrabold text-gray-900">$<span id="stat-earnings">0.00</span></span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
+                        <span class="text-gray-500 text-xs font-bold uppercase tracking-wider">Deliveries</span>
+                        <div class="flex items-baseline gap-1 mt-2">
+                            <span class="text-2xl font-extrabold text-gray-900" id="stat-count">0</span>
+                            <span class="text-xs text-green-600 font-bold">Completed</span>
+                        </div>
+                    </div>
+                    <!-- Mobile Toggle -->
+                    <div class="col-span-2 lg:hidden bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
+                        <div>
+                            <span class="text-gray-900 font-bold block">Go Online</span>
+                            <span id="mobile-toggle-text" class="text-xs text-gray-500">You are currently online</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="mobile-toggle" class="sr-only peer" checked onclick="DeliveryDashboard.toggleAvailability()">
+                            <div class="w-14 h-8 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Content Grid -->
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                    <!-- Active Task -->
+                    <div class="xl:col-span-2 space-y-6">
+                        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                            <i data-lucide="navigation" class="w-5 h-5 text-orange-600"></i> Current Task
+                        </h2>
+                        <div id="active-order-container" class="transition-all-300"></div>
+                    </div>
+
+                    <!-- Recent Activity (Limit 5) -->
+                    <div class="xl:col-span-1 space-y-6">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-lg font-bold text-gray-900">Recent Activity</h2>
+                            <button onclick="DeliveryDashboard.loadHistory()" class="p-1 hover:bg-gray-100 rounded-lg text-gray-500 transition">
+                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <div id="recent-history-list" class="space-y-4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 2: FULL HISTORY (Hidden by default) -->
+            <div id="view-history" class="hidden space-y-6 animate-slide-up">
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <i data-lucide="archive" class="w-6 h-6 text-orange-600"></i> All Deliveries
+                        </h2>
+                        <div class="flex gap-2">
+                            <button onclick="DeliveryDashboard.loadHistory()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-bold text-gray-600 transition">
+                                <i data-lucide="refresh-cw" class="w-4 h-4 inline mr-1"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Table Header -->
+                    <div class="grid grid-cols-4 gap-4 px-4 py-2 bg-gray-50 rounded-lg text-xs font-bold text-gray-500 uppercase tracking-wider mb-4 hidden md:grid">
+                        <div>Order ID</div>
+                        <div>Date</div>
+                        <div>Status</div>
+                        <div class="text-right">Earnings</div>
+                    </div>
+
+                    <!-- Full List Container -->
+                    <div id="full-history-list" class="space-y-3">
+                        <!-- Injected JS -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Nav -->
+    <nav class="lg:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 py-3 px-6 z-30 flex justify-around items-center safe-area-pb">
+        <button onclick="DeliveryDashboard.switchView('dashboard')" class="flex flex-col items-center gap-1 text-gray-600 hover:text-orange-600">
+            <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+            <span class="text-[10px] font-bold">Home</span>
+        </button>
+        <button onclick="DeliveryDashboard.switchView('history')" class="flex flex-col items-center gap-1 text-gray-600 hover:text-orange-600">
+            <i data-lucide="history" class="w-6 h-6"></i>
+            <span class="text-[10px] font-medium">History</span>
+        </button>
+        <button onclick="DeliveryDashboard.logout()" class="flex flex-col items-center gap-1 text-gray-600 hover:text-red-600">
+            <i data-lucide="log-out" class="w-6 h-6"></i>
+            <span class="text-[10px] font-medium">Exit</span>
+        </button>
+    </nav>
+
+    <!-- Dependencies -->
+    <script src="js/api.js"></script>
+    <script src="js/delivery_dashboard.js"></script>
+</body>
+</html>

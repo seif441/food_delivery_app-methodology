@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "yourStrong#Password1"
+      MSSQL_PID: "Developer"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "yourStrong#Password1" -Q "SELECT 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  init-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: init-db
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    volumes:
+      - ./db_scripts/sqlserver/init.sql:/init.sql
+    command: /opt/mssql-tools18/bin/sqlcmd -C -S sqlserver -U sa -P "yourStrong#Password1" -i /init.sql
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "5005:5005"
+    depends_on:
+      init-db:
+        condition: service_completed_successfully
+      sqlserver:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:sqlserver://sqlserver:1433;databaseName=FoodDeliveryDB;encrypt=true;trustServerCertificate=true;
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD: yourStrong#Password1
+    restart: on-failure
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  sqlserver_data:

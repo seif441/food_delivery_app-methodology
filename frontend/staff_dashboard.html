@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <title>Crave Staff - Kitchen Display</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Scrollbar */
+        .ticket-scroll::-webkit-scrollbar { width: 6px; }
+        .ticket-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
+        .ticket-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+        
+        /* Entrance Animation */
+        .animate-slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Exit Animation */
+        .animate-scale-out { animation: scaleOut 0.2s ease-in forwards; }
+        @keyframes scaleOut {
+            to { opacity: 0; transform: scale(0.9); }
+        }
+
+        /* Sizzle Animation */
+        .animate-sizzle {
+            animation: sizzleGlow 0.8s ease-in-out infinite alternate;
+            border-color: #f97316 !important; 
+        }
+        @keyframes sizzleGlow {
+            from { box-shadow: 0 0 5px rgba(249, 115, 22, 0.2); }
+            to { box-shadow: 0 0 20px rgba(249, 115, 22, 0.6); transform: scale(1.02); }
+        }
+
+        /* Steam Particles */
+        .steam-particle {
+            position: absolute;
+            background: rgba(156, 163, 175, 0.4);
+            border-radius: 50%;
+            filter: blur(2px);
+            pointer-events: none;
+            z-index: 50;
+            animation: rise 1s ease-out forwards;
+        }
+        @keyframes rise {
+            0% { transform: translateY(0) scale(0.5); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-40px) scale(2); opacity: 0; }
+        }
+
+        /* Status Accents */
+        .status-border-pending { border-top: 4px solid #f59e0b; }
+        .status-border-preparing { border-top: 4px solid #3b82f6; }
+        .status-border-ready { border-top: 4px solid #22c55e; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900 h-screen flex flex-col overflow-hidden">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 shrink-0 z-20">
+        <div class="flex items-center gap-4">
+            <div class="bg-gray-900 text-white p-2 rounded-lg">
+                <i data-lucide="chef-hat" class="w-6 h-6"></i>
+            </div>
+            <h1 class="text-xl font-extrabold tracking-tight">Crave <span class="text-gray-400 font-medium">Kitchen Display</span></h1>
+        </div>
+
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2 text-sm font-medium text-green-600 bg-green-50 px-3 py-1.5 rounded-full border border-green-100">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+                Live Updates
+            </div>
+            
+            <!-- Staff Profile & Logout -->
+            <div class="flex items-center gap-4 pl-6 border-l border-gray-200">
+                <div class="flex items-center gap-3">
+                    <div class="text-right hidden sm:block">
+                        <!-- Name is now injected via JS -->
+                        <p id="staff-name-display" class="text-sm font-bold text-gray-900 animate-pulse">Loading...</p>
+                        <p class="text-xs text-gray-500">Chef</p>
+                    </div>
+                    <div class="h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500">
+                        <i data-lucide="user" class="w-6 h-6"></i>
+                    </div>
+                </div>
+                
+                <button onclick="StaffDashboard.logout()" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100" title="Log Out">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Toolbar -->
+    <div class="bg-white border-b border-gray-200 py-3 px-6 flex justify-between items-center shrink-0">
+        <div class="flex gap-2">
+            <button onclick="StaffDashboard.filterView('all')" id="btn-all" class="px-4 py-2 rounded-lg text-sm font-bold bg-gray-900 text-white transition-colors">All Orders</button>
+            <button onclick="StaffDashboard.filterView('pending')" id="btn-pending" class="px-4 py-2 rounded-lg text-sm font-bold bg-white text-gray-600 hover:bg-gray-50 border border-gray-200 transition-colors">Pending</button>
+            <button onclick="StaffDashboard.filterView('preparing')" id="btn-preparing" class="px-4 py-2 rounded-lg text-sm font-bold bg-white text-gray-600 hover:bg-gray-50 border border-gray-200 transition-colors">Preparing</button>
+            <button onclick="StaffDashboard.filterView('completed')" id="btn-completed" class="px-4 py-2 rounded-lg text-sm font-bold bg-white text-gray-600 hover:bg-gray-50 border border-gray-200 transition-colors">Completed</button>
+        </div>
+        <button onclick="StaffDashboard.fetchOrders()" class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition">
+            <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+        </button>
+    </div>
+
+    <!-- Main Board -->
+    <main class="flex-1 overflow-x-auto overflow-y-hidden p-6">
+        <div class="flex h-full gap-6 min-w-[1024px]">
+            <!-- Column 1: PENDING -->
+            <div class="flex-1 flex flex-col bg-gray-200/50 rounded-xl border border-gray-200/60 overflow-hidden transition-all">
+                <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="font-bold text-gray-700 flex items-center gap-2"><i data-lucide="clipboard-list" class="w-5 h-5 text-yellow-500"></i> New Orders</h2>
+                    <span id="count-pending" class="bg-yellow-100 text-yellow-700 text-xs font-bold px-2 py-1 rounded-full">0</span>
+                </div>
+                <div id="col-pending" class="flex-1 overflow-y-auto p-4 space-y-4 ticket-scroll relative"></div>
+            </div>
+
+            <!-- Column 2: PREPARING -->
+            <div class="flex-1 flex flex-col bg-gray-200/50 rounded-xl border border-gray-200/60 overflow-hidden transition-all">
+                <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="font-bold text-gray-700 flex items-center gap-2"><i data-lucide="flame" class="w-5 h-5 text-blue-500"></i> Cooking</h2>
+                    <span id="count-preparing" class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded-full">0</span>
+                </div>
+                <div id="col-preparing" class="flex-1 overflow-y-auto p-4 space-y-4 ticket-scroll relative"></div>
+            </div>
+
+            <!-- Column 3: READY -->
+            <div class="flex-1 flex flex-col bg-gray-200/50 rounded-xl border border-gray-200/60 overflow-hidden transition-all">
+                <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="font-bold text-gray-700 flex items-center gap-2"><i data-lucide="bike" class="w-5 h-5 text-green-500"></i> Ready / Delivery</h2>
+                    <span id="count-ready" class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">0</span>
+                </div>
+                <div id="col-ready" class="flex-1 overflow-y-auto p-4 space-y-4 ticket-scroll relative"></div>
+            </div>
+        </div>
+    </main>
+    <script src="js/api.js"></script>
+    <script src="js/staff_dashboard.js"></script>
+    
+</body>
+</html>

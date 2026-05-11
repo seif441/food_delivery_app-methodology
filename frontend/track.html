@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <title>Tracking Order</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .step-active .circle { background-color: #f97316; border-color: #f97316; color: white; }
+        .step-completed .circle { background-color: #22c55e; border-color: #22c55e; color: white; }
+        .step-completed .line { background-color: #22c55e; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <header class="bg-white p-4 shadow-sm flex items-center gap-4">
+        <button onclick="window.location.href='orders.html'" class="p-2 hover:bg-gray-100 rounded-full"><i data-lucide="arrow-left" class="w-6 h-6"></i></button>
+        <h1 class="text-xl font-bold">Tracking Order #<span id="order-id">...</span></h1>
+    </header>
+
+    <main class="max-w-md mx-auto p-6 space-y-8">
+        
+        <!-- Status Banner -->
+        <div class="bg-white p-6 rounded-3xl shadow-sm text-center">
+            <div id="status-icon-container" class="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                <i id="status-icon" data-lucide="clock" class="w-10 h-10 text-orange-600"></i>
+            </div>
+            <h2 id="status-title" class="text-2xl font-extrabold text-gray-900">Order Placed</h2>
+            <p id="status-desc" class="text-gray-500 mt-2">We have received your order.</p>
+        </div>
+
+        <!-- Timeline -->
+        <div class="space-y-0 relative pl-4 border-l-2 border-gray-200 ml-4" id="timeline">
+            <!-- Steps injected by JS -->
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="font-bold text-gray-900 mb-2">Order Details</h3>
+            <div id="order-items" class="text-sm text-gray-600 space-y-1"></div>
+            <div class="border-t border-gray-100 mt-3 pt-3 flex justify-between font-bold">
+                <span>Total</span>
+                <span id="order-total">$0.00</span>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="js/api.js"></script>
+    <script>
+        lucide.createIcons();
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('id');
+        const userId = JSON.parse(localStorage.getItem('user'))?.id;
+
+        document.getElementById('order-id').innerText = orderId;
+
+        async function init() {
+            if(!userId || !orderId) {
+                alert("Invalid Tracking Link");
+                window.location.href = 'orders.html';
+                return;
+            }
+
+            // Fetch specific order details (using the existing endpoint)
+            try {
+                // We fetch ALL user orders and find the specific one 
+                // (Alternatively, create a backend endpoint GET /api/orders/{id})
+                const response = await fetch(`${API_BASE}/orders/customer/${userId}`);
+                const orders = await response.json();
+                const order = orders.find(o => o.id == orderId);
+
+                if(order) renderTracking(order);
+                else throw new Error("Order not found");
+
+            } catch(e) {
+                alert("Error loading order.");
+                console.error(e);
+            }
+        }
+
+        function renderTracking(order) {
+            const steps = [
+                { status: 'PENDING', label: 'Order Placed', icon: 'clipboard-check' },
+                { status: 'PREPARING', label: 'Kitchen Preparing', icon: 'chef-hat' },
+                { status: 'OUT_FOR_DELIVERY', label: 'Out for Delivery', icon: 'bike' },
+                { status: 'DELIVERED', label: 'Delivered', icon: 'home' }
+            ];
+
+            const currentStatus = order.status;
+            let foundCurrent = false;
+
+            // Update Header
+            const activeStep = steps.find(s => s.status === currentStatus) || steps[0];
+            document.getElementById('status-title').innerText = activeStep.label;
+            document.getElementById('status-desc').innerText = getStatusMsg(currentStatus);
+            
+            // Render Timeline
+            const timeline = document.getElementById('timeline');
+            timeline.innerHTML = steps.map((step, idx) => {
+                let stateClass = 'text-gray-400';
+                let circleClass = 'bg-gray-100 border-gray-300';
+                
+                if (step.status === currentStatus) {
+                    stateClass = 'text-gray-900 font-bold';
+                    circleClass = 'bg-orange-600 border-orange-600 text-white shadow-lg shadow-orange-200';
+                    foundCurrent = true;
+                } else if (!foundCurrent) {
+                    stateClass = 'text-green-600 font-medium'; // Past steps
+                    circleClass = 'bg-green-500 border-green-500 text-white';
+                }
+
+                return `
+                    <div class="relative pb-8 pl-6">
+                        <div class="absolute -left-[21px] top-0 w-10 h-10 rounded-full border-4 flex items-center justify-center ${circleClass} bg-white z-10 transition-all">
+                            <i data-lucide="${step.icon}" class="w-5 h-5"></i>
+                        </div>
+                        <div class="${stateClass} pt-2">${step.label}</div>
+                    </div>
+                `;
+            }).join('');
+
+            // Render Items
+            document.getElementById('order-items').innerHTML = (order.items || []).map(i => 
+                `<div class="flex justify-between"><span>${i.quantity}x ${i.product.name}</span><span>$${(i.product.price * i.quantity).toFixed(2)}</span></div>`
+            ).join('');
+            document.getElementById('order-total').innerText = `$${order.totalPrice.toFixed(2)}`;
+
+            lucide.createIcons();
+        }
+
+        function getStatusMsg(status) {
+            if(status === 'PENDING') return "Waiting for the restaurant to confirm.";
+            if(status === 'PREPARING') return "Your food is being prepared with care.";
+            if(status === 'OUT_FOR_DELIVERY') return "Driver is on the way to your location.";
+            if(status === 'DELIVERED') return "Enjoy your meal!";
+            return "Status updated.";
+        }
+
+        init();
+    </script>
+</body>
+</html>
