@@ -9,15 +9,39 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    # This creates a modular SQL Server 'VM' inside the GitHub runner
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: YourPassword123!
+        ports:
+          - 1433:1433
+        # Ensures the runner waits for SQL Server to be 'Healthy' before starting the build
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourPassword123!' -C -Q 'SELECT 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up JDK 17 # Or 21 depending on your version
-      uses: actions/setup-dotnet@v4 # Use setup-java for Spring Boot
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
       with:
         java-version: '21'
         distribution: 'temurin'
         cache: maven
-        
+
+    # Builds the project. The service container allows the 'contextLoads' test to pass.
     - name: Build with Maven
       run: mvn -B package --file backend/pom.xml
+      env:
+        # These must match the service credentials above to prevent connection errors
+        SPRING_DATASOURCE_URL: jdbc:sqlserver://localhost:1433;databaseName=master;trustServerCertificate=true
+        SPRING_DATASOURCE_USERNAME: sa
+        SPRING_DATASOURCE_PASSWORD: YourPassword123!
