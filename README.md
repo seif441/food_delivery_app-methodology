@@ -24,6 +24,13 @@ Added product management functionality for restaurants.
 ## Authentication Module Added
 This project now supports JWT authentication.
 
+
+## Methodology Features
+- Jira Scrum Management
+- GitHub Flow
+- Docker Containers
+- CI/CD Pipeline
+
 ## Run Project
 
 ```bash
