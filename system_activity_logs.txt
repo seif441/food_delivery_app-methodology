@@ -1,0 +1,33 @@
+[2025-12-13 19:07:03] LOGIN           | User: serial | Role: CUSTOMER | Action: Logged In
+[2025-12-13 19:07:15] ORDER_PLACED    | Order ID: 30 placed by null | Total: $27.490000000000002
+[2025-12-13 19:07:36] LOGIN           | User: Rawan Salah | Role: STAFF | Action: Logged In
+[2025-12-13 19:08:02] KITCHEN_START   | Order ID: 30 is now being prepared by Kitchen Staff.
+[2025-12-13 19:08:08] KITCHEN_READY   | Order ID: 29 is prepared.
+[2025-12-13 19:08:08] DRIVER_ASSIGNED | Order ID: 29 assigned to Driver: Rawan Driver
+[2025-12-13 19:08:17] KITCHEN_READY   | Order ID: 30 is prepared.
+[2025-12-13 19:08:17] DRIVER_ASSIGNED | Order ID: 30 assigned to Driver: Driver
+[2025-12-13 19:08:46] LOGIN           | User: Eman | Role: CUSTOMER | Action: Logged In
+[2025-12-13 19:08:58] ORDER_PLACED    | Order ID: 31 placed by null | Total: $55.49
+[2025-12-13 19:09:32] LOGIN           | User: Rawan Salah | Role: STAFF | Action: Logged In
+[2025-12-13 19:09:38] KITCHEN_START   | Order ID: 31 is now being prepared by Kitchen Staff.
+[2025-12-13 19:09:41] KITCHEN_READY   | Order ID: 31 is prepared.
+[2025-12-13 19:09:41] DRIVER_BUSY     | Order ID: 31 is waiting. No drivers available.
+[2025-12-13 19:10:11] LOGIN           | User: Rawan Driver | Role: DELIVERY_STAFF | Action: Logged In
+[2025-12-13 19:10:21] ORDER_DELIVERED | Order ID: 29 delivered successfully by Rawan Driver
+[2025-12-13 19:10:32] ORDER_DELIVERED | Order ID: 31 delivered successfully by Rawan Driver
+[2025-12-13 19:15:39] LOGIN           | User: Eman | Role: CUSTOMER | Action: Logged In
+[2025-12-13 19:15:53] ORDER_PLACED    | Order ID: 32 placed by Eman | Total: $58.99
+[2025-12-13 19:19:17] ORDER_PLACED    | Order ID: 33 placed by Eman | Total: $16.990000000000002
+[2025-12-13 19:19:21] ORDER_CANCELLED | Order ID: 33 was cancelled by the customer.
+[2025-12-13 19:37:23] LOGIN           | User: System Administrator | Role: ADMIN | Action: Logged In
+[2025-12-13 20:28:22] LOGIN           | User: Eman | Role: CUSTOMER | Action: Logged In
+[2025-12-13 20:28:30] ORDER_PLACED    | Order ID: 34 placed by Eman | Total: $27.490000000000002
+[2025-12-13 20:29:08] LOGIN           | User: System Administrator | Role: ADMIN | Action: Logged In
+[2025-12-13 20:29:49] LOGIN           | User: Rawan Salah | Role: STAFF | Action: Logged In
+[2025-12-13 20:29:54] KITCHEN_START   | Order ID: 34 is now being prepared by Kitchen Staff.
+[2025-12-13 20:30:10] KITCHEN_READY   | Order ID: 34 is prepared.
+[2025-12-13 20:30:10] DRIVER_ASSIGNED | Order ID: 34 assigned to Driver: Rawan Driver
+[2025-12-13 20:33:26] ORDER_DELIVERED | Order ID: 34 delivered successfully by Rawan Driver
+[2025-12-13 20:35:15] LOGIN           | User: Driver | Role: DELIVERY_STAFF | Action: Logged In
+[2025-12-13 20:35:24] ORDER_DELIVERED | Order ID: 30 delivered successfully by Driver
+[2025-12-13 21:45:38] LOGIN           | User: System Administrator | Role: ADMIN | Action: Logged In
