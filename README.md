@@ -15,6 +15,12 @@ A full-stack food delivery system built using:
 - Delivery dashboard
 - Order tracking
 
+## Authentication Module
+Implemented login and registration system using JWT authentication.
+
+## Product Management
+Added product management functionality for restaurants.
+
 ## Run Project
 
 ```bash
