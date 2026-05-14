@@ -11,3 +11,5 @@ public class FoodDeliveryAppApplication {
 	}
 
 }
+
+// This is the main class for the Food Delivery Application. It uses Spring Boot to run the application. The @SpringBootApplication annotation indicates that this is a Spring Boot application, and the main method starts the application by calling SpringApplication.run().
