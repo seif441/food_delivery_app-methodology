@@ -21,6 +21,9 @@ Implemented login and registration system using JWT authentication.
 ## Product Management
 Added product management functionality for restaurants.
 
+## Authentication Module Added
+This project now supports JWT authentication.
+
 ## Run Project
 
 ```bash
